@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Your next chapter, down to the second. A retro retirement countdown with a live local clock.">
+  <title>Time Circuits | Retirement Countdown</title>
+  <script>
+    (() => {
+      const param = new URLSearchParams(window.location.search).get("scoutTheme");
+      const theme =
+        param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --cp-bg: #f7f4ef;
+      --cp-bg-elevated: #fcfbf8;
+      --cp-surface: #ffffff;
+      --cp-surface-soft: #f5f5f5;
+      --cp-border: #dedede;
+      --cp-border-strong: #919191;
+      --cp-text: #242424;
+      --cp-text-muted: #5c5c5c;
+      --cp-text-soft: #6f6f6f;
+      --cp-accent: #b11f4b;
+      --cp-accent-hover: #9a1a41;
+      --cp-accent-soft: rgba(177, 31, 75, 0.08);
+      --cp-accent-fg: #ffffff;
+      --cp-success: #16a34a;
+      --cp-danger: #dc2626;
+      --cp-warning: #f59e0b;
+      --cp-link: #0078d4;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+      --cp-overlay: rgba(255, 255, 255, 0.8);
+      --cp-panel: rgba(255, 255, 255, 0.86);
+      --cp-panel-strong: rgba(255, 255, 255, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.55);
+      --cp-highlight: rgba(177, 31, 75, 0.12);
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --cp-bg: #3d3b3a;
+      --cp-bg-elevated: #343231;
+      --cp-surface: #292929;
+      --cp-surface-soft: #2e2e2e;
+      --cp-border: #474747;
+      --cp-border-strong: #5f5f5f;
+      --cp-text: #dedede;
+      --cp-text-muted: #919191;
+      --cp-text-soft: #b0b0b0;
+      --cp-accent: #fd8ea1;
+      --cp-accent-hover: #fb7b91;
+      --cp-accent-soft: rgba(253, 142, 161, 0.14);
+      --cp-accent-fg: #1a1a1a;
+      --cp-success: #4ade80;
+      --cp-danger: #f87171;
+      --cp-warning: #fbbf24;
+      --cp-link: #4da6ff;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+      --cp-overlay: rgba(41, 41, 41, 0.88);
+      --cp-panel: rgba(41, 41, 41, 0.72);
+      --cp-panel-strong: rgba(41, 41, 41, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.04);
+      --cp-highlight: rgba(253, 142, 161, 0.12);
+    }
+    :root {
+      --cp-circuit-sky: #2a2d31;
+      --cp-circuit-night: #111214;
+      --cp-circuit-black: #050506;
+      --cp-circuit-metal-top: #8d9196;
+      --cp-circuit-metal-mid: #6c7075;
+      --cp-circuit-metal-bottom: #5a5e63;
+      --cp-circuit-rim: #2b2d30;
+      --cp-circuit-edge: #44474b;
+      --cp-circuit-texture: rgba(255, 255, 255, 0.035);
+      --cp-circuit-shine: rgba(255, 255, 255, 0.35);
+      --cp-circuit-shadow: rgba(0, 0, 0, 0.7);
+      --cp-circuit-inset: #141516;
+      --cp-circuit-window: #050505;
+      --cp-circuit-label: #7e1410;
+      --cp-circuit-label-border: #a01d17;
+      --cp-circuit-white: #f4efe6;
+      --cp-circuit-muted: #999999;
+      --cp-circuit-red: #ff3028;
+      --cp-circuit-green: #39ff48;
+      --cp-circuit-amber: #ffcb32;
+      --cp-circuit-control: #1b1c1e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100svh; padding: 24px 30px;
+      display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(ellipse at 50% 0%, var(--cp-circuit-sky), var(--cp-circuit-night) 60%, var(--cp-circuit-black));
+      color: var(--cp-circuit-white); color-scheme: dark;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+    }
+    button, input { font: inherit; }
+    button, summary { cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--cp-circuit-amber); outline-offset: 5px; }
+    .app { width: min(100%, 908px, calc(63.5vw + 95.5px)); container-type: inline-size; display: flex; flex-direction: column; align-items: center; }
+    .chassis {
+      position: relative; width: 100%; border-radius: 10px; padding: 22px 26px 28px;
+      background: repeating-linear-gradient(90deg, var(--cp-circuit-texture) 0 1px, transparent 1px 3px),
+        linear-gradient(var(--cp-circuit-metal-top), var(--cp-circuit-metal-mid) 45%, var(--cp-circuit-metal-bottom));
+      box-shadow: 0 0 0 2px var(--cp-circuit-rim), 0 0 0 6px var(--cp-circuit-edge),
+        0 20px 50px var(--cp-circuit-shadow), inset 0 1px var(--cp-circuit-shine);
+    }
+    .screw { position: absolute; top: 10px; width: 12px; height: 12px; border: 1px solid var(--cp-circuit-edge); border-radius: 50%; background: linear-gradient(135deg, var(--cp-circuit-white), var(--cp-circuit-metal-bottom)); box-shadow: 0 1px 2px var(--cp-circuit-shadow); }
+    .screw:nth-child(1) { left: 10px; }
+    .screw:nth-child(2) { right: 10px; }
+    .circuit { --digit-height: clamp(20px, 5.2vw, 66.56px); }
+    .circuit + .circuit { margin-top: 18px; }
+    .readout {
+      display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) minmax(0, 4fr) clamp(25px, 3.85cqw, 35px) minmax(0, 2fr) 0.17fr minmax(0, 2fr);
+      align-items: end; gap: clamp(4px, 1.97cqw, 17.92px); padding: 10px 20px 14px;
+      border-radius: 6px; background: var(--cp-circuit-inset);
+      box-shadow: inset 0 3px 8px var(--cp-circuit-black), 0 1px var(--cp-circuit-shine);
+    }
+    .destination { color: var(--cp-circuit-red); }
+    .present { color: var(--cp-circuit-green); }
+    .remaining {
+      color: var(--cp-circuit-amber); min-height: calc(var(--digit-height) * 1.24 + 53px);
+      grid-template-columns: minmax(0, 3fr) 0.2fr minmax(0, 2fr) 0.2fr minmax(0, 2fr) 0.2fr minmax(0, 2fr);
+      padding-inline: clamp(42px, 14cqw, 128px); gap: clamp(3px, 0.65cqw, 6px);
+    }
+    .field { min-width: 0; }
+    .field-label {
+      display: block; padding: 2px 0; background: var(--cp-circuit-label); color: var(--cp-circuit-white);
+      font-size: clamp(8px, 1.43cqw, 13px); line-height: 15px; font-weight: 700; letter-spacing: 0.04em; text-align: center;
+      margin-bottom: 6px; box-shadow: inset 0 -1px var(--cp-circuit-shadow);
+    }
+    .field > div { background: var(--cp-circuit-window); padding: calc(var(--digit-height) * 0.12) calc(var(--digit-height) * 0.14); box-shadow: inset 0 0 12px var(--cp-circuit-black); }
+    .digits { display: flex; gap: 4%; height: var(--digit-height); align-items: center; transform: skewX(-5deg); }
+    .digit { width: 0; flex: 1; height: 100%; overflow: visible; }
+    .segment { fill: currentColor; opacity: 0.055; }
+    .segment.on { opacity: 1; filter: drop-shadow(0 0 1px currentColor) drop-shadow(0 0 3px currentColor); }
+    .meridiem { height: calc(var(--digit-height) * 1.24 + 29px); display: flex; flex-direction: column; justify-content: space-between; font-size: clamp(8px, 1.43cqw, 13px); text-align: center; font-weight: 700; color: var(--cp-circuit-white); }
+    .meridiem span { background: var(--cp-circuit-label); padding: 2px 0 0; }
+    .meridiem span::after { content: ""; display: block; width: clamp(5px, 1cqw, 9px); height: clamp(5px, 1cqw, 9px); border-radius: 50%; background: var(--cp-circuit-red); margin: 5px auto; opacity: 0.1; }
+    .destination .meridiem .active::after { background: var(--cp-circuit-red); }
+    .present .meridiem .active::after { background: var(--cp-circuit-green); }
+    .meridiem .active::after { opacity: 1; box-shadow: 0 0 6px currentColor; }
+    .colon { height: calc(var(--digit-height) * 1.24); display: flex; justify-content: center; align-items: center; font-size: 0; }
+    .colon::before { content: ""; width: calc(var(--digit-height) * 0.08); height: calc(var(--digit-height) * 0.08); border-radius: 50%; box-shadow: 0 calc(var(--digit-height) * -0.15) currentColor, 0 calc(var(--digit-height) * 0.15) currentColor; filter: drop-shadow(0 0 2px currentColor); }
+    .plate { display: table; margin: 8px auto 0; padding: 5px 18px 4px; border-radius: 2px; background: linear-gradient(var(--cp-circuit-inset), var(--cp-circuit-window)); color: var(--cp-circuit-white); font-size: clamp(11px, 1.5vw, 17px); line-height: 1.18; font-weight: 700; letter-spacing: 0.3em; text-align: center; box-shadow: 0 2px 3px var(--cp-circuit-shadow); }
+    details { width: min(100%, 380px); margin-top: 26px; text-align: center; color: var(--cp-circuit-muted); font-size: 14px; }
+    summary { font-size: 12px; line-height: 14px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; }
+    form { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px 4px; padding-top: 12px; }
+    label { font-size: 14px; }
+    input { width: 183px; min-width: 0; border: 1px solid var(--cp-circuit-edge); border-radius: 4px; background: var(--cp-circuit-control); color: var(--cp-circuit-white); padding: 6px 10px; font-size: 14px; }
+    .engage { border: 1px solid var(--cp-circuit-label-border); border-radius: 4px; background: var(--cp-circuit-label); color: var(--cp-circuit-white); padding: 6px 10px; font-size: 14px; }
+    .engage:hover { filter: brightness(1.2); }
+    .message { max-width: 420px; font-size: 13px; line-height: 1.5; margin: 16px 0 0; text-align: center; color: var(--cp-circuit-white); }
+    .message:empty { display: none; }
+    .message.error { color: var(--cp-circuit-red); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+    noscript p { padding: 24px; text-align: center; }
+    @media (max-width: 600px) {
+      .app { width: min(100%, calc(56.8vw + 87.6px)); }
+      .circuit { --digit-height: max(20px, 5.8vw); }
+      .chassis { padding: 20px 8px 26px; }
+      .readout { padding: 8px 6px 12px; }
+      .field-label { line-height: 9px; margin-bottom: 4px; }
+      .meridiem { height: max(52px, calc(var(--digit-height) * 1.24 + 17px)); }
+      .remaining { min-height: calc(var(--digit-height) * 1.24 + 41px); padding-inline: clamp(36px, 14cqw, 70px); }
+      .plate { font-size: 11px; line-height: 12px; letter-spacing: 0.2em; }
+    }
+  </style>
+</head>
+<body>
+  <noscript><p>Enable JavaScript to run the live clock and retirement countdown.</p></noscript>
+  <main class="app">
+    <h1 class="sr-only">Time Circuits - Retirement Countdown</h1>
+    <section class="chassis" aria-label="Retirement time circuits">
+      <span class="screw" aria-hidden="true"></span><span class="screw" aria-hidden="true"></span>
+      <section class="circuit destination" aria-labelledby="destination-heading">
+        <div class="readout" id="destination-display" aria-hidden="true"></div>
+        <h2 class="plate" id="destination-heading">DESTINATION TIME</h2>
+        <p class="sr-only" id="destination-accessible"></p>
+      </section>
+      <section class="circuit present" aria-labelledby="present-heading">
+        <div class="readout" id="present-display" aria-hidden="true"></div>
+        <h2 class="plate" id="present-heading">PRESENT TIME</h2>
+        <p class="sr-only" id="present-accessible"></p>
+      </section>
+      <section class="circuit" aria-labelledby="remaining-heading">
+        <div role="timer" aria-live="off" id="countdown">
+          <div class="readout remaining" id="remaining-display" aria-hidden="true"></div>
+          <span class="sr-only" id="remaining-accessible"></span>
+        </div>
+        <h2 class="plate" id="remaining-heading">TIME REMAINING</h2>
+      </section>
+    </section>
+    <p class="sr-only" id="journey-status">Time circuits online</p>
+    <details id="settings">
+      <summary>Set destination time</summary>
+      <form id="destination-form">
+        <label for="destination-input">Destination</label>
+          <input id="destination-input" name="destination" type="datetime-local" required min="1000-01-01T00:00" max="9999-12-31T23:59" aria-describedby="date-hint">
+          <button type="submit" class="engage">Engage</button>
+        <p class="sr-only" id="date-hint">Enter your local date and time. Your destination is saved on this device.</p>
+      </form>
+    </details>
+    <p class="message" id="message" role="status" aria-live="polite"></p>
+    <p class="sr-only" id="timezone"></p>
+  </main>
+  <script id="countdown-core">
+    "use strict";
+    const Countdown = (() => {
+      const pad = (value, length = 2) => String(value).padStart(length, "0");
+      function parseLocal(value) {
+        const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value);
+        if (!match) throw new RangeError("Enter a complete destination date and time.");
+        const [year, month, day, hour, minute] = match.slice(1).map(Number);
+        const date = new Date(year, month - 1, day, hour, minute);
+        if (year < 1000 || year > 9999 || date.getFullYear() !== year ||
+            date.getMonth() !== month - 1 || date.getDate() !== day ||
+            date.getHours() !== hour || date.getMinutes() !== minute) {
+          throw new RangeError("That local date or time does not exist. Choose a valid date and time.");
+        }
+        return date;
+      }
+      function localInput(date) {
+        return `${pad(date.getFullYear(), 4)}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+      }
+      function remaining(target, now) {
+        if (!Number.isFinite(target) || !Number.isFinite(now)) throw new RangeError("Countdown dates must be valid.");
+        const total = Math.max(0, Math.ceil((target - now) / 1000));
+        return {
+          days: Math.floor(total / 86400),
+          hours: Math.floor(total / 3600) % 24,
+          minutes: Math.floor(total / 60) % 60,
+          seconds: total % 60,
+          complete: now >= target
+        };
+      }
+      function restore(value) {
+        const settings = JSON.parse(value);
+        if (!settings || settings.version !== 1 || typeof settings.destination !== "string") {
+          throw new RangeError("Saved destination settings are not recognized.");
+        }
+        const date = new Date(settings.destination);
+        if (!Number.isFinite(date.getTime()) || date.getFullYear() < 1000 || date.getFullYear() > 9999) {
+          throw new RangeError("The saved destination is not a valid date.");
+        }
+        return date;
+      }
+      return { pad, parseLocal, localInput, remaining, restore };
+    })();
+  </script>
+  <script>
+    (() => {
+      "use strict";
+      const storageKey = "time-circuits.destination.v1";
+      const get = (id) => document.getElementById(id);
+      const message = get("message");
+      function notify(text, error = false) {
+        message.textContent = text;
+        message.classList.toggle("error", error);
+      }
+      let destination = Countdown.parseLocal("2026-12-25T00:00");
+      try {
+        const stored = localStorage.getItem(storageKey);
+        if (stored !== null) destination = Countdown.restore(stored);
+      } catch (error) {
+        notify(`Could not load saved settings: ${error.message} The default destination is displayed.`, true);
+      }
+      const shapes = [
+        "5,2 25,2 29,6 25,10 5,10 1,6",
+        "26,11 30,7 30,28 26,32 22,28 22,15",
+        "26,35 30,39 30,59 26,63 22,59 22,39",
+        "5,60 21,60 25,64 21,68 5,68 1,64",
+        "0,39 4,35 8,39 8,59 4,63 0,59",
+        "0,7 4,11 8,15 8,28 4,32 0,28",
+        "5,31 21,31 25,35 21,39 5,39 1,35"
+      ];
+      const numbers = ["012345", "12", "01346", "01236", "1256", "02356", "023456", "012", "0123456", "012356"];
+      const letterShapes = [
+        ...shapes.slice(0, 6),
+        "2,35 6,31 13,31 13,39 6,39",
+        "17,31 24,31 28,35 24,39 17,39",
+        "6,12 10,12 14,27 14,31 10,27",
+        "21,12 25,12 20,27 16,31 16,27",
+        "11,40 15,39 15,44 9,58 5,58",
+        "16,39 20,40 25,58 21,58 16,44",
+        "13,11 17,11 17,29 13,29",
+        "13,41 17,41 17,59 13,59",
+        "1,11 6,11 17,60 13,67",
+        "25,11 30,11 17,67 13,60"
+      ];
+      const letters = {
+        A: [0, 1, 2, 4, 5, 6, 7], B: [0, 1, 2, 3, 7, 12, 13],
+        C: [0, 3, 4, 5], D: [0, 1, 2, 3, 12, 13],
+        E: [0, 3, 4, 5, 6, 7], F: [0, 4, 5, 6, 7],
+        G: [0, 2, 3, 4, 5, 7], J: [1, 2, 3, 4], L: [3, 4, 5],
+        M: [1, 2, 4, 5, 8, 9], N: [1, 2, 4, 5, 8, 11],
+        O: [0, 1, 2, 3, 4, 5], P: [0, 1, 4, 5, 6, 7],
+        R: [0, 1, 4, 5, 6, 7, 11], S: [0, 2, 3, 5, 6, 7],
+        T: [0, 12, 13], U: [1, 2, 3, 4, 5], V: [14, 15], Y: [8, 9, 13]
+      };
+      function makeDigits(parent, count, polygons) {
+        const digits = document.createElement("span");
+        digits.className = "digits";
+        for (let i = 0; i < count; i++) {
+          const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+          svg.setAttribute("viewBox", "-2 0 34 70");
+          svg.setAttribute("class", "digit");
+          polygons.forEach((points) => {
+            const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+            polygon.setAttribute("points", points);
+            polygon.setAttribute("class", "segment");
+            svg.append(polygon);
+          });
+          digits.append(svg);
+        }
+        parent.replaceChildren(digits);
+      }
+      function setDigits(parent, value, alphabet = numbers, polygons = shapes) {
+        if (parent.dataset.value === value) return;
+        if (parent.firstElementChild?.children.length !== value.length) makeDigits(parent, value.length, polygons);
+        Array.from(parent.firstElementChild.children).forEach((svg, index) => {
+          const active = alphabet[value[index]];
+          Array.from(svg.children).forEach((segment, part) => {
+            segment.classList.toggle("on", Array.isArray(active) ? active.includes(part) : active.includes(String(part)));
+          });
+        });
+        parent.dataset.value = value;
+      }
+      function field(label, parent, month = false) {
+        const container = document.createElement("div");
+        container.className = "field";
+        const caption = document.createElement("span");
+        caption.className = "field-label";
+        caption.textContent = label;
+        const value = document.createElement("div");
+        if (month) value.className = "month";
+        container.append(caption, value);
+        parent.append(container);
+        return value;
+      }
+      function colon(parent) {
+        const span = document.createElement("span");
+        span.className = "colon";
+        span.textContent = ":";
+        parent.append(span);
+      }
+      function dateDisplay(parent) {
+        const month = field("MONTH", parent, true);
+        const day = field("DAY", parent);
+        const year = field("YEAR", parent);
+        const meridiem = document.createElement("div");
+        meridiem.className = "meridiem";
+        const am = document.createElement("span");
+        am.textContent = "AM";
+        const pm = document.createElement("span");
+        pm.textContent = "PM";
+        meridiem.append(am, pm);
+        parent.append(meridiem);
+        const hour = field("HOUR", parent);
+        colon(parent);
+        const minute = field("MIN", parent);
+        return (date) => {
+          setDigits(month, date.toLocaleString("en-US", { month: "short" }).toUpperCase(), letters, letterShapes);
+          setDigits(day, Countdown.pad(date.getDate()));
+          setDigits(year, Countdown.pad(date.getFullYear(), 4));
+          setDigits(hour, Countdown.pad(date.getHours() % 12 || 12));
+          setDigits(minute, Countdown.pad(date.getMinutes()));
+          am.classList.toggle("active", date.getHours() < 12);
+          pm.classList.toggle("active", date.getHours() >= 12);
+        };
+      }
+      const drawDestination = dateDisplay(get("destination-display"));
+      const drawPresent = dateDisplay(get("present-display"));
+      const countdownFields = ["DAYS", "HOURS", "MINS", "SECS"].map((label, index) => {
+        if (index) colon(get("remaining-display"));
+        return field(label, get("remaining-display"));
+      });
+      const formatDate = (date) => date.toLocaleString(undefined, {
+        year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "2-digit"
+      });
+      let lastPresentMinute;
+      let wasComplete = false;
+      function tick() {
+        const now = new Date();
+        const minute = Math.floor(now.getTime() / 60000);
+        if (minute !== lastPresentMinute) {
+          drawPresent(now);
+          get("present-accessible").textContent = formatDate(now);
+          lastPresentMinute = minute;
+        }
+        const left = Countdown.remaining(destination.getTime(), now.getTime());
+        [left.days, left.hours, left.minutes, left.seconds].forEach((value, index) => {
+          setDigits(countdownFields[index], Countdown.pad(value, index === 0 ? 3 : 2));
+        });
+        get("remaining-accessible").textContent = `${left.days} days, ${left.hours} hours, ${left.minutes} minutes, ${left.seconds} seconds remaining.`;
+        get("journey-status").textContent = left.complete ? "Destination reached. Welcome to your next chapter." : "Time circuits online. Your future is getting closer.";
+        if (left.complete && !wasComplete && !message.classList.contains("error")) {
+          notify("Destination reached. Welcome to your next chapter!");
+        }
+        wasComplete = left.complete;
+      }
+      function updateDestination() {
+        drawDestination(destination);
+        get("destination-accessible").textContent = formatDate(destination);
+        get("destination-input").value = Countdown.localInput(destination);
+        tick();
+      }
+      get("destination-form").addEventListener("submit", (event) => {
+        event.preventDefault();
+        let next;
+        try {
+          next = Countdown.parseLocal(get("destination-input").value);
+        } catch (error) {
+          notify(error.message, true);
+          get("destination-input").focus();
+          return;
+        }
+        destination = next;
+        let saved = true;
+        try {
+          localStorage.setItem(storageKey, JSON.stringify({ version: 1, destination: destination.toISOString() }));
+        } catch (error) {
+          saved = false;
+          notify(`Destination engaged for this session, but could not be saved: ${error.message}`, true);
+        }
+        updateDestination();
+        if (saved) {
+          notify(destination.getTime() <= Date.now() ?
+            "Destination saved and already reached. Welcome to your next chapter!" :
+            `Destination engaged and saved: ${formatDate(destination)}.`);
+        }
+      });
+      get("timezone").textContent = `Local time / ${Intl.DateTimeFormat().resolvedOptions().timeZone}`;
+      updateDestination();
+      // Recalculate from the clock instead of subtracting seconds, including after sleep.
+      setInterval(tick, 250);
+      document.addEventListener("visibilitychange", () => { if (!document.hidden) tick(); });
+    })();
+  </script>
+</body>
+</html>
